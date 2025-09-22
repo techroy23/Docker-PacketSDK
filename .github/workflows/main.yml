@@ -1,0 +1,86 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  repository_dispatch:
+    types: [trigger-sub-build]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Notify Discord build start
+      - name: Notify Start on Discord
+        run: |
+          TIMESTAMP=$(TZ=Asia/Manila date +"%Y-%m-%d %H:%M:%S %Z %z")
+          JSON_PAYLOAD=$(jq -n --arg title "🛠️ Build Started" \
+            --arg repo "**📦 Repository:** ${{ github.repository }}" \
+            --arg branch "**🌱 Branch:** ${{ github.ref }}" \
+            --arg time "**🕒 Triggered at:** ${TIMESTAMP}" \
+            '{ "embeds": [{ "title": $title, "description": ($repo + "\n" + $branch + "\n" + $time) }] }')
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" -d "$JSON_PAYLOAD"
+
+      # Step 3: Log in to GHCR
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Step 4: Enable QEMU for cross-arch builds
+      - name: Set Up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Step 5: Enable Buildx
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 6: Build and push multi-arch image in one go
+      - name: Build and Push Multi-Arch Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # Only build amd64, arm64, armv7
+          platforms: |
+            linux/amd64
+            linux/arm64
+            linux/arm/v7
+          tags: |
+            ghcr.io/${{ github.actor }}/docker-packetsdk:multi
+            ghcr.io/${{ github.actor }}/docker-packetsdk:latest
+            ghcr.io/${{ github.actor }}/docker-packetsdk:x86_64
+            ghcr.io/${{ github.actor }}/docker-packetsdk:aarch64
+            ghcr.io/${{ github.actor }}/docker-packetsdk:armv7l
+
+      # Step 7: Notify Discord success
+      - name: Notify Success on Discord
+        if: success()
+        run: |
+          TIMESTAMP=$(TZ=Asia/Manila date +"%Y-%m-%d %H:%M:%S %Z %z")
+          JSON_PAYLOAD=$(jq -n --arg title "✅ Build Done" \
+            --arg repo "**📦 Repository:** ${{ github.repository }}" \
+            --arg branch "**🌱 Branch:** ${{ github.ref }}" \
+            --arg time "**🕒 Completed at:** ${TIMESTAMP}" \
+            '{ "embeds": [{ "title": $title, "description": ($repo + "\n" + $branch + "\n" + $time) }] }')
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" -d "$JSON_PAYLOAD"
+
+      # Step 8: Notify Discord failure
+      - name: Notify Failure on Discord
+        if: failure()
+        run: |
+          TIMESTAMP=$(TZ=Asia/Manila date +"%Y-%m-%d %H:%M:%S %Z %z")
+          JSON_PAYLOAD=$(jq -n --arg title "❌ Build Error" \
+            --arg repo "**📦 Repository:** ${{ github.repository }}" \
+            --arg branch "**🌱 Branch:** ${{ github.ref }}" \
+            --arg time "**🕒 Failed at:** ${TIMESTAMP}" \
+            '{ "embeds": [{ "title": $title, "description": ($repo + "\n" + $branch + "\n" + $time) }] }')
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" -d "$JSON_PAYLOAD"

@@ -6,7 +6,7 @@ set -eu
 #  - Detects system architecture
 #  - Selects correct binary from /app/source/<arch>/
 #  - Ensures binary is executable
-#  - Runs binary with restart loop (1h max runtime per cycle)
+#  - Runs binary with restart loop (3h max runtime per cycle)
 # ============================================================
 #
 
@@ -136,11 +136,11 @@ while true; do
     wait -n $PID $SLEEP_PID
 
     if kill -0 $PID 2>/dev/null; then
-        log "1h elapsed, killing process $PID"
+        log "time elapsed, killing process $PID"
         kill -TERM $PID
         wait $PID || true
     else
-        log "Process exited before 1h, restarting..."
+        log "Process exited, restarting..."
     fi
 
     # Clean up sleep process if still running

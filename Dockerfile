@@ -4,7 +4,9 @@ ARG TARGETARCH
 
 WORKDIR /app
 
-RUN apk add --no-cache ca-certificates ca-certificates-bundle unzip curl bash dos2unix iptables redsocks \
+RUN apk update \
+    && apk upgrade --no-cache \
+    && apk add --no-cache ca-certificates ca-certificates-bundle unzip curl bash dos2unix tzdata iptables redsocks \
     && update-ca-certificates
 
 COPY source/aarch64/packet_sdk /tmp/packet_sdk_arm64
@@ -27,5 +29,3 @@ RUN dos2unix /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-
-CMD ["bash"]

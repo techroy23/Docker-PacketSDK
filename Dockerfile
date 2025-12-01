@@ -22,6 +22,8 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     fi \
     && rm -rf /tmp/packet_sdk_*
 
+RUN touch /app/.run_On_Docker
+
 COPY entrypoint.sh /app/entrypoint.sh
 
 RUN dos2unix /app/entrypoint.sh

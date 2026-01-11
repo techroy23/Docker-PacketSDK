@@ -87,6 +87,8 @@ check_ip() {
 }
 
 main() {
+  FORCE_TIMEOUT="${FORCE_TIMEOUT:-21600}"  # default 6 hour
+
   while true; do
       setup_proxy
       check_ip
@@ -94,10 +96,28 @@ main() {
       "$BIN_SDK" -appkey="$APPKEY" &
       PID=$!
       log " >>> An2Kin >>> APP PID is $PID"
+
+      # Start watchdog timer to kill app after FORCE_TIMEOUT seconds
+      (
+        sleep "$FORCE_TIMEOUT"
+        if kill -0 $PID 2>/dev/null; then
+          log " >>> An2Kin >>> Force timeout reached ($FORCE_TIMEOUT sec), killing PID $PID"
+          kill $PID 2>/dev/null || true
+        fi
+      ) &
+
+      WATCHDOG=$!
+
+      # Wait for app to exit (either crash or killed by watchdog)
       wait $PID
       log " >>> An2Kin >>> Process exited, restarting..."
+
+      # Clean up watchdog if app exited early
+      kill $WATCHDOG 2>/dev/null || true
+
       sleep 5
   done
 }
+
 
 main

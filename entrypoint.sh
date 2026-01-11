@@ -91,7 +91,7 @@ main() {
       setup_proxy
       check_ip
       log " >>> An2Kin >>> Starting binary..."
-      "$BIN_SDK" -appkey="$APPKEY" "$@" &
+      "$BIN_SDK" -appkey="$APPKEY" &
       PID=$!
       log " >>> An2Kin >>> APP PID is $PID"
       wait $PID

@@ -87,9 +87,6 @@ check_ip() {
 }
 
 main() {
-  FORCE_TIMEOUT="${FORCE_TIMEOUT:-21600}"   # default 6 hours
-  OFFSET_RANGE="${OFFSET_RANGE:-500}"       # default 500 seconds
-
   while true; do
       setup_proxy
       check_ip
@@ -97,27 +94,10 @@ main() {
       "$BIN_SDK" -appkey="$APPKEY" &
       PID=$!
       log " >>> An2Kin >>> APP PID is $PID"
-
-      OFFSET=$(( RANDOM % (2 * OFFSET_RANGE + 1) - OFFSET_RANGE ))
-      EFFECTIVE_TIMEOUT=$(( FORCE_TIMEOUT + OFFSET ))
-      log " >>> An2Kin >>> Watchdog set for ${EFFECTIVE_TIMEOUT} seconds"
-
-      (
-        sleep "$EFFECTIVE_TIMEOUT"
-        if kill -0 $PID 2>/dev/null; then
-          log " >>> An2Kin >>> Timeout reached, killing PID $PID"
-          kill $PID 2>/dev/null || true
-        fi
-      ) &
-      WATCHDOG=$!
-
       wait $PID
       log " >>> An2Kin >>> Process exited, restarting..."
-      kill $WATCHDOG 2>/dev/null || true
       sleep 5
   done
 }
-
-
 
 main

@@ -25,20 +25,31 @@ sudo sysctl -w net.core.wmem_max=8000000
 
 ## Environment variables
 | Variable | Requirement | Description |
-|----------|-------------|-------------|
-| `APPKEY` | Required    | Your PacketSDK key. Container exits if not provided. |
+|:--------:|:-----------:|:-----------:|
+| via ENV<br />`-e APPKEY=AbCdEfGhIjKLmNo`<br />via ARG<br />`AbCdEfGhIjKLmNo` | Required    | Your PacketSDK key. Container exits if not provided. |
 | `PROXY`  | Optional    | External proxy endpoint in the form `host:port`. |
 
-## Run the container:
+## Run via ENV
 ```bash
 docker run -d \
   --name=packetsdk \
   --cpus=0.25 --pull=always --restart=always \
   --log-driver=json-file --log-opt max-size=1m --log-opt max-file=1 \
   --cap-add=NET_ADMIN --cap-add=NET_RAW --sysctl net.ipv4.ip_forward=1 \
-  -e APPKEY=PACKETSDK_KEY \
+  -e APPKEY=AbCdEfGhIjKLmNo \
   -e PROXY=123.456.789.012:34567 \
   techroy23/docker-packetsdk:latest
+```
+
+## Run via ARG
+```bash
+docker run -d \
+  --name=packetsdk \
+  --cpus=0.25 --pull=always --restart=always \
+  --log-driver=json-file --log-opt max-size=1m --log-opt max-file=1 \
+  --cap-add=NET_ADMIN --cap-add=NET_RAW --sysctl net.ipv4.ip_forward=1 \
+  -e PROXY=123.456.789.012:34567 \
+  techroy23/docker-packetsdk:latest AbCdEfGhIjKLmNo
 ```
 
 # Invite Link

@@ -5,7 +5,7 @@ A minimal Alpine based Docker image for running the **PacketSDK**.
 ## Links
 | DockerHub | GitHub | Invite |
 |----------|----------|----------|
-| [![Docker Hub](https://img.shields.io/badge/ㅤ-View%20on%20Docker%20Hub-blue?logo=docker&style=for-the-badge)](https://hub.docker.com/r/techroy23/docker-packetsdk) | [![GitHub Repo](https://img.shields.io/badge/ㅤ-View%20on%20GitHub-black?logo=github&style=for-the-badge)](https://github.com/techroy23/Docker-PacketSDK) | [![Invite Link](https://img.shields.io/badge/ㅤ-Join%20PacketSDK%20Now-brightgreen?logo=linktree&style=for-the-badge)](https://packetsdk.com/?r=L2kDofIF) |
+| [![Docker Hub](https://img.shields.io/badge/ㅤ-View%20on%20Docker%20Hub-blue?logo=docker&style=for-the-badge)](https://hub.docker.com/r/techroy23/docker-packetsdk) | [![GitHub Repo](https://img.shields.io/badge/ㅤ-View%20on%20GitHub-black?logo=github&style=for-the-badge)](https://github.com/techroy23/Docker-PacketSDK) | [![Invite Link](https://img.shields.io/badge/ㅤ-Join%20PacketSDK%20Now-brightgreen?logo=linktree&style=for-the-badge)](https://pkdsdk.com/?r=L2kDofIF) |
 
 ## Features
 - Lightweight Alpine Linux base image.
@@ -53,4 +53,4 @@ docker run -d \
 ```
 
 # Invite Link
-### https://packetsdk.com/?r=L2kDofIF
+### https://pkdsdk.com/?r=L2kDofIF
